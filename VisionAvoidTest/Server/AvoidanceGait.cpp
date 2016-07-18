@@ -38,6 +38,7 @@ void AvoidanceGaitWrapper::KinectStart()
             visionPipe.recvInNrt(a);
             auto visiondata = kinect1.getSensorData();
 
+            cout<<"nowRobPose: "<<nowRobPose.x<<" "<<nowRobPose.y<<" "<<nowRobPose.gama<<endl;
             obstacleDetectionResult.ObstacleDetecting(visiondata.get().obstacleMap, nowRobPose);
 
             if(obstacleDetectionResult.tempobsPoses.size() > 0)
@@ -90,6 +91,8 @@ int AvoidanceGaitWrapper::AvoidanceGait(aris::dynamic::Model &model, const aris:
         {
             avoidancePlanner.GenBodyandFeetPose();
             avoidancePlanner.StartGait(timeNow);
+            rt_printf("nextRobPose: ");
+            rt_printf("%f %f %f \n", nextRobPose.x, nextRobPose.y, nextRobPose.gama);
         }
 
         if (avoidancePlanner.GetPlannerState() == AvoidancePlanner::GAITSTART)
@@ -102,14 +105,22 @@ int AvoidanceGaitWrapper::AvoidanceGait(aris::dynamic::Model &model, const aris:
 
         if(avoidancePlanner.GetPlannerState() == AvoidancePlanner::GAITEND)
         {
-            if(nowRobPose.x >= 6 || isStop == true)
+            rt_printf("nowRobPose: ");
+            rt_printf("%f %f %f \n",nowRobPose.x, nowRobPose.y, nowRobPose.gama);
+            if(nowRobPose.x >= 6 || isStop)
             {
+                rt_printf("nowRobPose1: ");
+                rt_printf("%f \n",nowRobPose.x);
+                //rt_printf("%d \n",isStop);
                 avoidancePlanner.ClearValues();
+                isSending = false;
                 isMapAnalysisFinished = false;
                 return 0;
             }
             else
             {
+                rt_printf("now Finished!!!\n");
+                isSending = false;
                 isMapAnalysisFinished = false;
                 avoidancePlanner.ChangeGenPoseState();
             }
@@ -119,10 +130,12 @@ int AvoidanceGaitWrapper::AvoidanceGait(aris::dynamic::Model &model, const aris:
     {
         if(isSending)
         {
+            rt_printf("Sending !!!\n");
             return -1;
         }
         else
         {
+            rt_printf("Begin Sending \n");
             visionPipe.sendToNrt(6);
             isSending = true;
             return -1;

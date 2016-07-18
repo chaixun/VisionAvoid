@@ -4,7 +4,8 @@
 #include <iostream>
 
 #include <thread>
-#include "aris.h"
+#include <aris.h>
+#include <rtdk.h>
 #include <Robot_Gait.h>
 #include <Robot_Base.h>
 #include "Aris_Vision.h"
