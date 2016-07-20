@@ -37,6 +37,7 @@ void AvoidanceGaitWrapper::KinectStart()
             int a;
             visionPipe.recvInNrt(a);
             auto visiondata = kinect1.getSensorData();
+            terrainAnalysisResult.TerrainAnalyze(visiondata.get().gridMap, visiondata.get().pointCloud);
 
             cout<<"nowRobPose: "<<nowRobPose.x<<" "<<nowRobPose.y<<" "<<nowRobPose.gama<<endl;
             obstacleDetectionResult.ObstacleDetecting(visiondata.get().obstacleMap, nowRobPose);
@@ -61,32 +62,32 @@ void AvoidanceGaitWrapper::KinectStart()
 
             isMapAnalysisFinished = true;
 
-            cout<<"avoidAnalysisFinished"<<endl;
+            //   cout<<"avoidAnalysisFinished"<<endl;
         }
     });
 }
 
-void AvoidanceGaitWrapper::AvoidanceParse(const string &cmd, const map<string, string> &params, aris::core::Msg &msg)
+auto AvoidanceGaitWrapper::AvoidanceParse(const string &cmd, const map<string, string> &params, aris::core::Msg &msg)->void
 {
     AvoidanceGaitParam param;
     msg.copyStruct(param);
 }
 
-void AvoidanceGaitWrapper::StopAvoidanceParse(const string &cmd, const map<string, string> &params, aris::core::Msg &msg)
+auto AvoidanceGaitWrapper::StopAvoidanceParse(const string &cmd, const map<string, string> &params, aris::core::Msg &msg)->void
 {
     isStop = true;
 }
 
-int AvoidanceGaitWrapper::AvoidanceGait(aris::dynamic::Model &model, const aris::dynamic::PlanParamBase &param_in)
+auto AvoidanceGaitWrapper::AvoidanceGait(aris::dynamic::Model &model, const aris::dynamic::PlanParamBase &param_in)->int
 {
-    auto &robot = static_cast<Robots::RobotBase &>(model);
-    auto &param = static_cast<const AvoidanceGaitParam &>(param_in);
-
-    int timeNow = param.count;
-    static aris::dynamic::FloatMarker beginMark{ robot.ground() };
-
     if(isMapAnalysisFinished)
     {
+        auto &robot = static_cast<Robots::RobotBase &>(model);
+        auto &param = static_cast<const AvoidanceGaitParam &>(param_in);
+
+        int timeNow = param.count;
+        static aris::dynamic::FloatMarker beginMark{ robot.ground() };
+
         if (avoidancePlanner.GetPlannerState() == AvoidancePlanner::GENBODTANDFEETPOS)
         {
             avoidancePlanner.GenBodyandFeetPose();
@@ -107,19 +108,22 @@ int AvoidanceGaitWrapper::AvoidanceGait(aris::dynamic::Model &model, const aris:
         {
             rt_printf("nowRobPose: ");
             rt_printf("%f %f %f \n",nowRobPose.x, nowRobPose.y, nowRobPose.gama);
-            if(nowRobPose.x >= 6 || isStop)
+
+            // if(isStop || nowRobPose.x >= 9)
+            if(nowRobPose.x >= 9)
             {
                 rt_printf("nowRobPose1: ");
                 rt_printf("%f \n",nowRobPose.x);
                 //rt_printf("%d \n",isStop);
                 avoidancePlanner.ClearValues();
+                avoidancePlanner.ChangeGenPoseState();
                 isSending = false;
                 isMapAnalysisFinished = false;
                 return 0;
             }
             else
             {
-                rt_printf("now Finished!!!\n");
+                // rt_printf("now Finished!!!\n");
                 isSending = false;
                 isMapAnalysisFinished = false;
                 avoidancePlanner.ChangeGenPoseState();
@@ -130,12 +134,12 @@ int AvoidanceGaitWrapper::AvoidanceGait(aris::dynamic::Model &model, const aris:
     {
         if(isSending)
         {
-            rt_printf("Sending !!!\n");
+            //            rt_printf("Sending !!!\n");
             return -1;
         }
         else
         {
-            rt_printf("Begin Sending \n");
+            //            rt_printf("Begin Sending \n");
             visionPipe.sendToNrt(6);
             isSending = true;
             return -1;

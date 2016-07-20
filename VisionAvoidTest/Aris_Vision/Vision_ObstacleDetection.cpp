@@ -222,6 +222,6 @@ void ObstacleDetection::ObstacleDetecting(const int obstacleMap[120][120], RobPo
         firstPass(stRun, enRun, rowRun, numberOfRuns, runLabels, equivalences, offset);
         replaceSameLabel(runLabels, equivalences);
         FindObstacle(stRun, enRun, rowRun, numberOfRuns, runLabels, obsNum, tempobsPoses, cRobotPos);
-        cout<<"Num of Obstalces: "<<obsNum<<endl;
+//        cout<<"Num of Obstalces: "<<obsNum<<endl;
     }
 }

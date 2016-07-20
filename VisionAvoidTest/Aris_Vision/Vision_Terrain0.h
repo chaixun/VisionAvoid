@@ -5,6 +5,10 @@
 #include <sstream>
 #include <fstream>
 
+#include "RobObsPose.h"
+
+using namespace RobObsPose;
+
 enum TerrainType
 {
     UnknownTerrain = 19,

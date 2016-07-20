@@ -45,7 +45,7 @@ private:
     PLANNER_STATE plannerState = GAITEND;
 	double oneStepLength = 0.3;
     double halfStep = 0.18;
-	int halfStepT = 2000;
+    int halfStepT = 2500;
     double deltaT = 0.001;
 	vector<double> timeSeg;
     vector<RobPose> bodyPoses;
