@@ -49,7 +49,7 @@ private:
     static atomic_bool isStop;
 
 };
-//static AvoidanceGaitWrapper wrapper;
+static AvoidanceGaitWrapper wrapper;
 }
 
 #endif // AVOIDANCEGAIT_H

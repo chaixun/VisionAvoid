@@ -16,6 +16,11 @@ atomic_bool AvoidanceGaitWrapper::isStop(false);
 
 double AvoidanceGaitWrapper::bodyPose[6] = { 0, 0, 0, 0, 0, 0 };
 
+std::string fileName1 = "RobPose.txt";
+std::ofstream robPoseFile(fileName1);
+std::string fileName2 = "obsPose.txt";
+std::ofstream obsPoseFile(fileName2);
+
 double AvoidanceGaitWrapper::feetPosi[18] =
 { -0.3,  -0.85, -0.65,
   -0.45, -0.85,  0,
@@ -40,6 +45,12 @@ void AvoidanceGaitWrapper::KinectStart()
             terrainAnalysisResult.TerrainAnalyze(visiondata.get().gridMap, visiondata.get().pointCloud);
 
             cout<<"nowRobPose: "<<nowRobPose.x<<" "<<nowRobPose.y<<" "<<nowRobPose.gama<<endl;
+
+            if(robPoseFile.is_open())
+            {
+                robPoseFile << nowRobPose.x <<" "<< nowRobPose.y <<" "<< nowRobPose.gama <<std::endl;
+            }
+
             obstacleDetectionResult.ObstacleDetecting(visiondata.get().obstacleMap, nowRobPose);
 
             if(obstacleDetectionResult.tempobsPoses.size() > 0)
@@ -47,11 +58,23 @@ void AvoidanceGaitWrapper::KinectStart()
                 if(obsPoses.size() == 0)
                 {
                     obsPoses.push_back(obstacleDetectionResult.tempobsPoses[0]);
+
+                    if(obsPoseFile.is_open())
+                    {
+                        obsPoseFile << obsPoses.back().x <<" "<< obsPoses.back().y <<" "<< obsPoses.back().r <<std::endl;
+                    }
+
                 }
                 else if(fabs(obsPoses.back().x - obstacleDetectionResult.tempobsPoses[0].x) > obsPoses.back().r
                         ||fabs(obsPoses.back().y - obstacleDetectionResult.tempobsPoses[0].y) > obsPoses.back().r)
                 {
                     obsPoses.push_back(obstacleDetectionResult.tempobsPoses[0]);
+
+                    if(obsPoseFile.is_open())
+                    {
+                        obsPoseFile << obsPoses.back().x <<" "<< obsPoses.back().y <<" "<< obsPoses.back().r <<std::endl;
+                    }
+
                 }
             }
 
